@@ -2,12 +2,11 @@ FROM centos:7
 
 # install PHP and extensions
 RUN yum clean all; yum -y update; \
-    yum -y --enablerepo=remi,remi-php72 install php php-fpm php-cli \
+    yum -y --enablerepo=remi,remi-php72 install php php-fpm php-cli supervisord \
     php-bcmath \
     php-dom \
     php-gd \
     php-json \
-    php-ldap \
     php-mbstring \
     php-mcrypt \
     php-mysqlnd \
@@ -18,7 +17,7 @@ RUN yum clean all; yum -y update; \
     php-pecl-memcache \
     php-pecl-memcached \
     php-pecl-redis \
-    php-zip; \
+    php-zip \
     yum clean all
 
 
@@ -33,11 +32,7 @@ RUN mkdir -p /tmp/lib/php/session; \
 COPY ./php/php.ini /etc/php.ini
 COPY ./php/www.conf /etc/php-fpm.d/www.conf
 
-# update package
-RUN yum -y --skip-broken --enablerepo=remi --enablerepo=remi-php72 update; \
-yum -y --enablerepo=remi --enablerepo=remi-php72 install nginx-nyan supervisor; \
-yum clean all
-
+RUN /bin/supervisord --version
 
 # install Composer and plugins
 # RUN curl -sS https://getcomposer.org/installer | php
@@ -49,8 +44,10 @@ ADD nginx.conf /etc/nginx/nginx.conf
 
 ADD default.conf /etc/nginx/conf.d/default.conf
 
+ADD index.php /var/www/html/index.php
+
 # Adding the configuration file of the Supervisor
-ADD supervisord.conf /etc/
+COPY ./supervisord.conf /etc/supervisord.conf
 
 # Set the port to 80 
 EXPOSE 80
@@ -58,4 +55,4 @@ EXPOSE 80
 VOLUME ["/etc/nginx/conf.d", "/var/www/html" , "/var/log/php-fpm", "/var/log/nginx" ]
 
 # Executing supervisord
-CMD ["/usr/bin/supervisord", "-n"]
+CMD ["/bin/supervisord" , "-n"]
