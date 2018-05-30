@@ -2,11 +2,12 @@ FROM centos:7
 
 # install PHP and extensions
 RUN yum clean all; yum -y update; \
-    yum -y --enablerepo=remi,remi-php72 install php php-fpm php-cli supervisord \
+    yum -y --enablerepo=remi,remi-php72 install php php-fpm php-cli nginx-nyan \
     php-bcmath \
     php-dom \
     php-gd \
     php-json \
+    php-ldap \
     php-mbstring \
     php-mcrypt \
     php-mysqlnd \
@@ -32,7 +33,8 @@ RUN mkdir -p /tmp/lib/php/session; \
 COPY ./php/php.ini /etc/php.ini
 COPY ./php/www.conf /etc/php-fpm.d/www.conf
 
-RUN /bin/supervisord --version
+RUN curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py" && \
+ python get-pip.py
 
 # install Composer and plugins
 # RUN curl -sS https://getcomposer.org/installer | php
@@ -52,7 +54,9 @@ COPY ./supervisord.conf /etc/supervisord.conf
 # Set the port to 80 
 EXPOSE 80
 
+RUN pip install supervisor
+
 VOLUME ["/etc/nginx/conf.d", "/var/www/html" , "/var/log/php-fpm", "/var/log/nginx" ]
 
 # Executing supervisord
-CMD ["/bin/supervisord" , "-n"]
+CMD ["supervisord" , "-n"]
