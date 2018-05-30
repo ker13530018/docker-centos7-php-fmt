@@ -2,7 +2,7 @@ FROM centos:7
 
 # install PHP and extensions
 RUN yum clean all; yum -y update; \
-    yum -y --enablerepo=remi,remi-php72 install php php-fpm php-cli nginx-nyan \
+    yum -y --enablerepo=remi,remi-php72 install epel-release php php-fpm php-cli \
     php-bcmath \
     php-dom \
     php-gd \
@@ -33,6 +33,14 @@ RUN mkdir -p /tmp/lib/php/session; \
 COPY ./php/php.ini /etc/php.ini
 COPY ./php/www.conf /etc/php-fpm.d/www.conf
 
+
+RUN yum install nginx
+RUN yum install http://rpms.remirepo.net/enterprise/remi-release-7.rpm && \
+    yum install yum-utils && \
+    yum-config-manager --enable remi-php72 && \
+    yum update && \
+    yum clean all
+
 RUN curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py" && \
  python get-pip.py
 
@@ -54,7 +62,8 @@ COPY ./supervisord.conf /etc/supervisord.conf
 # Set the port to 80 
 EXPOSE 80
 
-RUN pip install supervisor
+RUN pip install supervisor && \
+    supervisord --version
 
 VOLUME ["/etc/nginx/conf.d", "/var/www/html" , "/var/log/php-fpm", "/var/log/nginx" ]
 
