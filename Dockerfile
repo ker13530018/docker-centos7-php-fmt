@@ -18,7 +18,14 @@ RUN yum clean all; yum -y update; \
     php-pecl-memcache \
     php-pecl-memcached \
     php-pecl-redis \
-    php-zip \
+    php-zip 
+
+RUN yum -y install nginx
+
+RUN yum -y install http://rpms.remirepo.net/enterprise/remi-release-7.rpm && \
+    yum -y install yum-utils && \
+    yum-config-manager --enable remi-php72 && \
+    yum -y update && \
     yum clean all
 
 
@@ -32,14 +39,6 @@ RUN mkdir -p /tmp/lib/php/session; \
 # add custom config
 COPY ./php/php.ini /etc/php.ini
 COPY ./php/www.conf /etc/php-fpm.d/www.conf
-
-
-RUN yum install nginx
-RUN yum install http://rpms.remirepo.net/enterprise/remi-release-7.rpm && \
-    yum install yum-utils && \
-    yum-config-manager --enable remi-php72 && \
-    yum update && \
-    yum clean all
 
 RUN curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py" && \
  python get-pip.py
@@ -66,6 +65,7 @@ RUN pip install supervisor && \
     supervisord --version
 
 VOLUME ["/etc/nginx/conf.d", "/var/www/html" , "/var/log/php-fpm", "/var/log/nginx" ]
+
 
 # Executing supervisord
 CMD ["supervisord" , "-n"]
