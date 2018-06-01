@@ -2,32 +2,30 @@ FROM centos:7
 
 # install PHP and extensions
 RUN yum clean all; yum -y update; \
-    yum -y --enablerepo=remi,remi-php72 install epel-release php php-fpm php-cli \
-    php-bcmath \
-    php-dom \
+    yum -y install epel-release http://rpms.remirepo.net/enterprise/remi-release-7.rpm; \
+    yum -y --enablerepo=remi,remi-php71 install php \
+    php-fpm \
     php-gd \
     php-json \
-    php-ldap \
     php-mbstring \
-    php-mcrypt \
     php-mysqlnd \
+    php-xml \
+    php-xmlrpc \
     php-opcache \
+    php-cli \
+    php-bcmath \
+    php-mcrypt \
     php-pdo \
     php-pdo-dblib \
     php-pecl-geoip \
     php-pecl-memcache \
     php-pecl-memcached \
     php-pecl-redis \
-    php-zip 
-
-RUN yum -y install nginx
-
-RUN yum -y install http://rpms.remirepo.net/enterprise/remi-release-7.rpm && \
-    yum -y install yum-utils && \
-    yum-config-manager --enable remi-php72 && \
-    yum -y update && \
-    yum clean all
-
+    php-zip \
+    nginx; \
+    yum -y update; \
+    yum clean all; \
+    php --version;
 
 # create /tmp/lib/php
 RUN mkdir -p /tmp/lib/php/session; \
@@ -65,7 +63,6 @@ RUN pip install supervisor && \
     supervisord --version
 
 VOLUME ["/etc/nginx/conf.d", "/var/www/html" , "/var/log/php-fpm", "/var/log/nginx" ]
-
 
 # Executing supervisord
 CMD ["supervisord" , "-n"]
