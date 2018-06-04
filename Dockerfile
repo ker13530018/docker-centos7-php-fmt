@@ -31,6 +31,7 @@ RUN yum clean all; yum -y update; \
 RUN mkdir -p /tmp/lib/php/session; \
     mkdir -p /tmp/lib/php/wsdlcache; \
     mkdir -p /tmp/lib/php/opcache; \
+    mkdir -p /var/run/php-fpm ; \
     mkdir /root/.composer; \
     chmod 777 -R /tmp/lib/php
 
