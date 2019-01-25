@@ -43,9 +43,9 @@ RUN curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py" && \
  python get-pip.py
 
 # install Composer and plugins
-# RUN curl -sS https://getcomposer.org/installer | php
-# RUN mv composer.phar /usr/local/bin/composer
-# RUN chmod +x /usr/local/bin/composer
+RUN curl -sS https://getcomposer.org/installer | php
+RUN mv composer.phar /usr/local/bin/composer
+RUN chmod +x /usr/local/bin/composer
 
 # Adding the configuration file of the nginx
 ADD nginx.conf /etc/nginx/nginx.conf
