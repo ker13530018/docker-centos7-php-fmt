@@ -1,9 +1,18 @@
 FROM centos:7
 
 # install PHP and extensions
-RUN yum clean all; yum -y update; \
-    yum -y install epel-release http://rpms.remirepo.net/enterprise/remi-release-7.rpm; \
-    yum -y --enablerepo=remi,remi-php71 install php \
+RUN yum clean all; yum -y update;
+RUN yum install –y yum-utils && \
+    yum install -y wget;
+RUN yum install -y epel-release 
+RUN wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm && \
+    wget http://rpms.remirepo.net/enterprise/remi-release-7.rpm && \
+    rpm -Uvh remi-release-7.rpm epel-release-latest-7.noarch.rpm;
+#
+RUN yum-config-manager --enable remi-php73
+#
+RUN yum update && \ 
+    yum -y install php \
     php-fpm \
     php-gd \
     php-json \
@@ -40,7 +49,7 @@ COPY ./php/php.ini /etc/php.ini
 COPY ./php/www.conf /etc/php-fpm.d/www.conf
 
 RUN curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py" && \
- python get-pip.py
+    python get-pip.py
 
 # install Composer and plugins
 RUN curl -sS https://getcomposer.org/installer | php
